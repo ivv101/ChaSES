@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: ipynb,py:light
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.14.0
+#   kernelspec:
+#     display_name: Python [conda env:p39] *
+#     language: python
+#     name: conda-env-p39-py
+# ---
+
+# +
 from os.path import join, dirname
 import datetime
 
@@ -10,6 +26,7 @@ from bokeh.models import ColumnDataSource, DataRange1d, Select
 from bokeh.palettes import Blues4
 from bokeh.plotting import figure
 
+# +
 STATISTICS = ['record_min_temp', 'actual_min_temp', 'average_min_temp', 'average_max_temp', 'actual_max_temp', 'record_max_temp']
 
 def get_dataset(src, name, distribution):
@@ -73,17 +90,24 @@ cities = {
     }
 }
 
-city_select = Select(value=city, title='City', options=sorted(cities.keys()))
-distribution_select = Select(value=distribution, title='Distribution', options=['Discrete', 'Smoothed'])
+def modify_doc(doc):
 
-df = pd.read_csv(join(dirname(__file__), 'data/2015_weather.csv'))
-source = get_dataset(df, cities[city]['airport'], distribution)
-plot = make_plot(source, "Weather data for " + cities[city]['title'])
+    city_select = Select(value=city, title='City', options=sorted(cities.keys()))
+    distribution_select = Select(value=distribution, title='Distribution', options=['Discrete', 'Smoothed'])
 
-city_select.on_change('value', update_plot)
-distribution_select.on_change('value', update_plot)
+    df = pd.read_csv(join(dirname(__file__), 'data/2015_weather.csv'))
+    source = get_dataset(df, cities[city]['airport'], distribution)
+    plot = make_plot(source, "Weather data for " + cities[city]['title'])
 
-controls = column(city_select, distribution_select)
+    city_select.on_change('value', update_plot)
+    distribution_select.on_change('value', update_plot)
 
-curdoc().add_root(row(plot, controls))
-curdoc().title = "Weather"
+    controls = column(city_select, distribution_select)
+
+    doc.add_root(row(plot, controls))
+    doc.title = "Weather"
+    
+# curdoc().add_root(row(plot, controls))
+# curdoc().title = "Weather"    
+
+modify_doc(curdoc())
