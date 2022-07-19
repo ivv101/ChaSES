@@ -1,7 +1,17 @@
+channels:
+  - conda-forge
 dependencies:
+  - python=3.9
   - bokeh
   - pandas
-  - scipy
+  - scikit-learn
+  - shapely
+  - alphashape
+  - astropy
+  - bs4
+  - python-magic
+  - kneed
+  - hdbscan
   - pip
   - pip:
-    - jupyter-server-proxy
+    - pca
