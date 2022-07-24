@@ -39,12 +39,6 @@ import bokeh.palettes as bkp
 
 # bk.output_notebook()
 # -
-import os
-a = os.system('hostname')
-
-
-os.uname()[1]
-
 import numpy as np
 # import math
 

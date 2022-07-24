@@ -6,7 +6,7 @@
 cd Chandra-ACIS-clusters-app
 ```
 
-1. [optional] Create environment
+2. [optional] Create environment
 
 ```
 mamba create -n Chandra-ACIS-clusters-app-env

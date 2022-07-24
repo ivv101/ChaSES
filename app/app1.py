@@ -32,11 +32,6 @@ except NameError:
 if notebook_dir[-4:] != '/app':
     notebook_dir += '/app'
 
-# if is_interactive():
-#     notebook_dir = os.path.abspath(os.path.dirname('__main__'))
-# else:    
-#     notebook_dir = os.path.abspath(os.path.dirname('__file__'))
-    
 os.chdir(notebook_dir)    
     
 print(notebook_dir)
@@ -70,15 +65,10 @@ if is_interactive():
     bk.output_notebook()
 
 # +
-import os
-# import os.path
 import numpy as np
 import pandas as pd
 
-# import scipy.stats
-
 import itertools  
-# from collections import Counter
 
 import pickle as pkl
 
@@ -87,18 +77,16 @@ from glob import glob
 import re
 
 from astropy.io import fits
-# from astropy.io.fits import getdata
 
 from urllib.request import urlopen, urlretrieve
 
-import logging
+# import logging
 
 from PIL import Image
 
 import sys
 
 # import cupy as cp
-
 # from cuml.cluster import DBSCAN
 # from cuml.metrics.cluster import silhouette_score
 # from cuml.metrics.cluster import silhouette_samples
@@ -161,98 +149,18 @@ hug_tree = json.load(urlopen(f'{hug_dir}/obsids.json'))
 # +
 upper_dir = '/'.join(notebook_dir.split('/')[:-1])
 
-cache_dir = f'{upper_dir}/cache' # 'app_cache'
+cache_dir = f'{upper_dir}/cache' 
 
 print(cache_dir)
 
 os.system(f'mkdir -p {cache_dir}')
-
-# fits_dir = '../data' #'/mnt/data_ssd/holes'
 
 fits_dir = {
     'local': f'{upper_dir}/data', #'/mnt/data_ssd/holes'
     'hug': 'https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data/resolve/main'
 }
 
-# obsids = {
-#     'local': np.sort([int(_) for _ in os.listdir(fits_dir['local']) if _[0]!='.']).astype(str).tolist(),
-#     'hug': list(hug_tree.keys())
-# }
-
 n_max = 20_000   
-
-# +
-# bk.curdoc().clear()
-
-# +
-# from sklearn import datasets
-# n_samples = 10_000
-# noisy_moons_X, noisy_moons_y = datasets.make_moons(n_samples=n_samples, noise=0.)
-
-# no_structure = np.random.rand(n_samples, 2)
-
-# scaled_xy = ext_lib.scale(*noisy_moons_X.T)
-
-# X = np.transpose([scaled_xy['x'], scaled_xy['y']])
-
-# X = np.concatenate([X, no_structure])
-
-# X_moon = (X - X.min(0)) / (X.max(0) - X.min(0))
-
-# p = bk.figure()
-# p.scatter(*X_moon.T)
-# bk.show(p)
-
-# +
-# X, db = pkl.load(open('tmp.pkl', 'rb'))
-                
-# silhs = app1_lib.get_silhouette_samples(X, db)  
-# silhs
-
-# +
-# glb = ''
-
-# +
-# class local_fits_class:
-    
-#     def __init__(self, fits_dir):   
-        
-#         self.fits_dir = fits_dir
-        
-#         obsids = subdirs_search(fits_dir)
-        
-#         self.obsids = {}
-        
-#         for obsid in obsids:
-            
-#             ccds = subdirs_search(f'{fits_dir}/{obsid}')
-            
-#             self.obsids[obsid] = {'ccds': ccds}
-            
-            
-            
-            
-        
-        
-        
-        
-#     def get_obsids(self, loc):
-    
-#         if loc == 'local':
-#             return np.sort([int(_) for _ in os.listdir(f'{self.fits_dir}') if _[0]!='.']).astype(str).tolist()
-        
-#         else:            
-#             return list(hug_tree.keys())    
-        
-        
-        
-    
-    
-# -
-
-log = logging.getLogger('bokeh')
-
-
 
 # +
 subdirs_search = lambda d: np.sort([int(_) for _ in next(os.walk(d))[1] if _[0]!='.']).astype(str).tolist()
@@ -290,80 +198,14 @@ def get_ccd_folders(obsid):
             json.dump(ccds, open(json_fn, 'wt'))
                 
     return [str(_) for _ in ccds]
-    
-# def get_ccd_folders_old(obsid, loc):
-    
-#     if loc == 'local':
-#         return subdirs_search(f"{fits_dir['local']}/{obsid}")
-#     else:            
-#         return [str(_) for _ in hug_tree[str(obsid)]]    
 
 
-# +
-# get_ccd_folders(333)
 # -
 
 if notebook_dir.split('/')[-1] != 'app':
     
     sys.exit(f'incorrect notebook_dir! {notebook_dir}')
 
-# +
-# head = fits.getheader('../data/333/acisf00333N003_evt2.fits.gz', 1)
-
-# +
-# [_[7:] for _ in set(head.keys()) if _[:7]=='BIASFIL']
-# +
-# fn = '../data/755/7/755_7_holes_evt2_05_8keV.fits'
-
-# fn = '../data/333/acisf00333N003_evt2.fits.gz'
-
-# fn = '../data/333/4/333_4_evt2_05_8keV.fits'
-
-# fits.getheader(fn, 1)
-# -
-
-
-
-
-# +
-# url = 'https://static.bokeh.org/branding/logos/bokeh-logo.svg'
-
-# url = 'https://cxc.cfa.harvard.edu/cdaftp/byobsid/3/333/primary/acisf00333N003_full_img2.jpg'
-
-# local_fn = url.split('/')[-1]
-
-# urlretrieve(url, local_fn) 
-
-
-
-# +
-# importlib.reload(ext_lib)
-
-# +
-# obsid = 333
-
-# # %time ext_lib.get_evt2_file(obsid, path=f"{fits_dir['local']}/{obsid}", search_mask='full_img2.jpg')
-
-# +
-# url = 'https://live.staticflickr.com/803/40807467832_eaf4690da0_b.jpg'
-
-# p = bk.figure()
-# z = p.image_url(url=[url], x=0, y=1, visible=True)
-# p.x_range.start = p.y_range.start = 0
-# p.x_range.end = p.y_range.end = 1    
-# p.x_range.range_padding = p.y_range.range_padding = 0
-# bk.show(p)
-
-# +
-# p = bk.figure(title='', tools=['hover'])
-# # p.image?
-
-# +
-# # !wget https://live.staticflickr.com/803/40807467832_eaf4690da0_b.jpg
-
-# +
-# fn = '/home/ivv101/oyk/Extended_sources/2022/Chandra-ACIS-clusters-app/app/40807467832_eaf4690da0_b.jpg'
-# -
 
 def image_url_pars(fn):
     
@@ -387,35 +229,6 @@ def image_url_pars(fn):
         
     return x, y, w, h
 
-# +
-# url = 'https://live.staticflickr.com/803/40807467832_eaf4690da0_b.jpg'
-
-# fn = '40807467832_eaf4690da0_b.jpg'
-
-# x, y, w, h = image_url_pars(fn)
-
-# p = bk.figure(title='zzz')
-# z = p.image_url(url=[url], x=0, y=1, w=1, h=1, visible=True)
-
-
-
-# z.glyph.x = x
-# z.glyph.y = y
-# z.glyph.w = w
-# z.glyph.h = h
-
-# def xxx():
-#     p.title.text = 'kkk'
-
-
-# p.x_range.start = p.y_range.start = 0
-# p.x_range.end = p.y_range.end = 1    
-# p.x_range.range_padding = p.y_range.range_padding = 0
-
-# xxx()
-
-
-# bk.show(p)
 
 # +
 frz = app1_lib.friz_class(history=True, inactive=False)
@@ -462,6 +275,7 @@ def modify_doc(doc):
     
     tbl_source = bk.ColumnDataSource()
     tbl = bk.DataTable(source=tbl_source, visible=False) 
+    save_table_button = bk.Button(label='save table as csv', width=100, visible=False)  
     
     sigma_slider = bk.Slider(start=0, end=3, value=1, step=0.01, title='sigma', width=100)
     nbins_slider = bk.Slider(start=1, end=200, value=100, step=1, title='nbins', width=100)
@@ -473,7 +287,12 @@ def modify_doc(doc):
                            options=pals,
                            width=200)
     
-    p = bk.figure(title='', tools=['hover'])
+    # tools=['hover']
+    tools=['save']
+        
+    p = bk.figure(title='', tools=tools)
+    # p.toolbar.autohide = True
+    
     img = p.image(image=[], x=0, y=0, dw=1, dh=1, 
                   palette=pallettes_dict[select_pallette.value], level='image')
     
@@ -496,7 +315,7 @@ def modify_doc(doc):
     apply_button = bk.Button(label='Apply', button_type='success', width=100)  
     
     min_sigma_slider = bk.Slider(start=0, end=10, value=5, step=1, title='min sigma', width=100)
-    
+        
     select_obsid = bk.Select(title='obsid', 
                          value=obsid_ini, 
                          options=obsids,
@@ -538,6 +357,7 @@ def modify_doc(doc):
         clus_source_filtered.data = empty  
         text_source.data = dict(x=[], y=[], text=[])
         tbl.visible = False 
+        save_table_button.visible = False 
         img.data_source.data['image'] = []
     
     def select_obsid_callback_aux():
@@ -587,8 +407,7 @@ def modify_doc(doc):
         msg.text = 'working ...'
         doc.add_next_tick_callback(select_obsid_callback_aux)
         doc.add_next_tick_callback(all_done_func)
-    
-                
+                    
     def get_ccd_evt2(obsid, ccd):   
         
         holes = True if holes_cb_group.active else False        
@@ -636,8 +455,6 @@ def modify_doc(doc):
         img.visible = True
         
         apply_button.disabled = False
-        
-        frz.comment += 'show_ccd_passed\n'
         
     show_ccd(obsid_ini, ccd_ini)
                    
@@ -687,6 +504,7 @@ def modify_doc(doc):
         frz.unfreeze('data_loc_rbg')
                     
         tbl.visible = False
+        save_table_button.visible = False 
         
         obsid = query_input.value.rstrip()
                         
@@ -719,31 +537,13 @@ def modify_doc(doc):
         msg.text = 'working ...'
         doc.add_next_tick_callback(holes_cb_group_callback_aux)
         doc.add_next_tick_callback(all_done_func)    
-        
-        
-        
-        
-        
-        
-        
-    TOOLTIPS = [
-        ('index', '$index'),
-        ('(x,y)', '@center_of_mass'),
-        ('silhouette', '@silhouette')
-    ]
-    
+                    
     query_button.on_click(query_button_callback)
     select_obsid.on_change('value', select_obsid_callback)  
     select_ccd.on_change('value', select_ccd_callback)  
     data_loc_rbg.on_change('active', data_loc_rbg_callback)
     holes_cb_group.on_change('active', holes_cb_group_callback)
             
-    p.toolbar.autohide = True
-    
-    hov = p.select_one(bk.HoverTool)
-    
-    # hov.tooltips = TOOLTIPS
-        
     p.x_range.start = p.y_range.start = 0
     p.x_range.end = p.y_range.end = 1    
     p.x_range.range_padding = p.y_range.range_padding = 0
@@ -752,7 +552,17 @@ def modify_doc(doc):
         
     clus = p.multi_polygons(xs='xs', ys='ys', color='color', source=clus_source_filtered, fill_alpha=opacity_slider.value)   
     
-    hov.renderers = [clus]
+    # hov = p.select_one(bk.HoverTool)
+    
+    # TOOLTIPS = [
+    #     ('index', '$index'),
+    #     ('(x,y)', '@center_of_mass'),
+    #     ('silhouette', '@silhouette')
+    # ]
+    
+    # hov.tooltips = TOOLTIPS
+
+    # hov.renderers = [clus]
 
     txts = p.text(x='x', y='y', text='text', angle=0, text_color='white', source=text_source)
             
@@ -793,21 +603,14 @@ def modify_doc(doc):
     X_source = bk.ColumnDataSource({'X': [], 'db': []})
                         
     def nbins_sigma_slider_callback(attr, old, new):
-        
-        # k = scipy.stats.gaussian_kde([x,y], sigma)
-        # xi, yi = np.mgrid[x.min():x.max():nbins*1j, y.min():y.max():nbins*1j]
-        # zi = k(np.vstack([xi.flatten(), yi.flatten()]))    
-        # d = zi.reshape(xi.shape).T
-        
+                
         H, bkg_dens = app1_lib.nbins_sigma_func(X_source.data['X'], nbins_slider.value, sigma_slider.value)
               
         img.data_source.data['image'] = [H.T]
                 
     sigma_slider.on_change('value', nbins_sigma_slider_callback)                       
     nbins_slider.on_change('value', nbins_sigma_slider_callback)   
-    
-    
-    
+        
     def min_sigma_slider_callback(attr, old, new):
         
         data = pd.DataFrame(clus_source.data)
@@ -835,23 +638,19 @@ def modify_doc(doc):
         img.glyph.color_mapper.palette = _[::-1] if len(new)==1 else _
             
     pal_reverse_checkbox.on_change('active', pal_reverse_checkbox_callback)
-            
+        
+    #qqq
     
-    
-#     d = Div(text="start")
-
-#     b = Button()
-
-#     def work():
-#         sleep(2)
-#         d.text = "end"
-
-    def cb():
-        msg.text = 'working ...'
-        doc.add_next_tick_callback(apply_button_callback)
-        doc.add_next_tick_callback(all_done_func)
+    def save_table_button_callback():
+        global frz
+        
+        data = tbl_source.data
+        
+        frz.comment = data
+                
+    save_table_button.on_click(save_table_button__callback)    
            
-    def apply_button_callback():
+    def apply_button_callback_aux():
         
         global frz        
         if frz.unfreeze('apply_button'): return
@@ -861,11 +660,7 @@ def modify_doc(doc):
         
         if ccd == '':
             return
-        
-        # debug_info_window.text += f'{obsid}/{ccd}\n'
-                
-        # msg.text = f'{cb_group.active}'
-                       
+                               
         holes = True if holes_cb_group.active else False        
         n_lim = True if n_max_cb_group.active else False
         
@@ -957,504 +752,104 @@ def modify_doc(doc):
         }
                         
         tbl_source.data, tbl.columns = get_table(new_data) 
-                        
-        # msg.text = f'{obsid}_{ccd} done'
         
         tbl.visible = True
+        save_table_button.visible = True
         
         return 'success'
-                        
-    apply_button.on_click(cb)
-    # apply_button.on_click(log_callback)
-        
-    process_all_button = bk.Button(label='Process all', button_type='primary', width=100) 
     
-    def process_all_button_callback():
+    def apply_button_callback():
+        msg.text = 'working ...'
+        doc.add_next_tick_callback(apply_button_callback_aux)
+        doc.add_next_tick_callback(all_done_func)
+                        
+    apply_button.on_click(apply_button_callback)
         
-        # global glb
+#     process_all_button = bk.Button(label='Process all', button_type='primary', width=100) 
+    
+#     def process_all_button_callback():
         
-        bad_obsids_ccd = []
+#         # global glb
         
-        all_dir = f'{cache_dir}/all'
+#         bad_obsids_ccd = []
         
-        loop_progress = cxo_lib.loop_class(obsids)
+#         all_dir = f'{cache_dir}/all'
         
-        for obsid in obsids:
+#         loop_progress = cxo_lib.loop_class(obsids)
+        
+#         for obsid in obsids:
             
-            loc = data_loc_active()
+#             loc = data_loc_active()
             
-            ccds = get_ccd_folders(obsid)
+#             ccds = get_ccd_folders(obsid)
             
-            # ccds = get_folders(obsid)
+#             # ccds = get_folders(obsid)
             
-            # process_all_button.label = f'{i}/{len(obsids)}''
+#             # process_all_button.label = f'{i}/{len(obsids)}''
             
-            for ccd in ccds:
+#             for ccd in ccds:
                 
-                select_obsid.value = obsid
-                select_ccd.value = ccd
+#                 select_obsid.value = obsid
+#                 select_ccd.value = ccd
                 
-                try:
-                    res = apply_button_callback()
-                except:
-                    bad_obsids_ccd.append([obsid, ccd, 'error'])
-                    continue
+#                 try:
+#                     res = apply_button_callback()
+#                 except:
+#                     bad_obsids_ccd.append([obsid, ccd, 'error'])
+#                     continue
                 
-                if res == 'empty':
-                #     # print(f'{obsid}_{ccd} empty')
-                    bad_obsids_ccd.append([obsid, ccd, 'empty'])
-                    continue
+#                 if res == 'empty':
+#                 #     # print(f'{obsid}_{ccd} empty')
+#                     bad_obsids_ccd.append([obsid, ccd, 'empty'])
+#                     continue
                 
-                hls = '_holes' if holes_cb_group.active else ''
+#                 hls = '_holes' if holes_cb_group.active else ''
                                                 
-                os.system(f'cd {notebook_dir}; mkdir -p {all_dir}')
+#                 os.system(f'cd {notebook_dir}; mkdir -p {all_dir}')
                 
-                tbl_json = json.loads(pd.DataFrame(tbl_source.data).to_json(orient='split', index=False, indent=4))
-                json.dump(tbl_json, open(f'{all_dir}/{obsid}_{ccd}{hls}.json', 'wt'))
+#                 tbl_json = json.loads(pd.DataFrame(tbl_source.data).to_json(orient='split', index=False, indent=4))
+#                 json.dump(tbl_json, open(f'{all_dir}/{obsid}_{ccd}{hls}.json', 'wt'))
                 
-                # glb = tbl_json
+#                 # glb = tbl_json
                   
-                _ = clus_source_filtered.data.copy()    
-                pkl.dump(_, open(f'{all_dir}/{obsid}_{ccd}{hls}.pkl', 'wb'))
+#                 _ = clus_source_filtered.data.copy()    
+#                 pkl.dump(_, open(f'{all_dir}/{obsid}_{ccd}{hls}.pkl', 'wb'))
                 
-                bk.export_png(p, filename=f'{all_dir}/{obsid}_{ccd}{hls}.png')  
+#                 bk.export_png(p, filename=f'{all_dir}/{obsid}_{ccd}{hls}.png')  
                 
-                # print(f'{obsid}_{ccd} done')
+#                 # print(f'{obsid}_{ccd} done')
                 
-            loop_progress()
+#             loop_progress()
             
-        pkl.dump(bad_obsids_ccd, open(f'{cache_dir}/bad_obsids_ccd.pkl', 'wb'))    
+#         pkl.dump(bad_obsids_ccd, open(f'{cache_dir}/bad_obsids_ccd.pkl', 'wb'))    
         
-    process_all_button.on_click(process_all_button_callback)    
+#     process_all_button.on_click(process_all_button_callback)    
         
     row1 = bk.row([select_obsid, select_ccd, len_pre], width=800)
     
     settings_column = bk.column([msg, bk.row(apply_button), #process_all_button), 
                                  bk.row(data_loc_rbg, bk.Spacer(width=100), bk.row(query_input, query_button)), 
                                  row1, cb_group, eps_slider, slider_min_samples, tbl, divTemplate, debug_info_window])
-    
+    # save_table_button
     layout = bk.row([bk.column([p, bk.row(select_pallette, pal_reverse_checkbox, min_sigma_slider), 
                                 bk.row(opacity_slider, alpha_slider), bk.row(nbins_slider, sigma_slider)]), settings_column])
     
     doc.add_root(layout)
     
     doc.title = 'Sliders'
-    
-    # cb()
-    
-    #qqq
-    
-    
+       
     # bk.export_png(p, filename=f'{save_dir}/{obsid_ccd}{hls}_blur.png')
 # -
 if is_interactive():
-    bk.show(modify_doc, notebook_url='localhost:1111', port=8910) # change
+    
+    if os.uname()[1]=='bobr970':
+        bk.show(modify_doc, notebook_url='localhost:1111', port=8910) # change
+    else:
+        bk.show(modify_doc)
 else:
     modify_doc(bk.curdoc())
 
 print(frz.history)
-
 print(frz.comment)
 
-
-
-# +
-# obsid = '333'
-# ccd = '4'
-# hls = ''
-
-# obsid_dir = f'{fits_dir["local"]}/{obsid}'
-# fn_ccd = f'{obsid_dir}/{ccd}/{obsid}_{ccd}{hls}_evt2_05_8keV.fits'
-
-
-# +
-# fits.info(fn_ccd)
-
-# +
-# data, head = fits.getdata(fn_ccd, 1), fits.getheader(fn_ccd, 1)
-
-# +
-# fits.getheader('zzz.fits', 1)
-
-# +
-# evt2_data, head = ext_lib.process_fits(fn)
-# evt2_data
-
-# +
-#||||||||||||||||||||\ \
-#<style>
-#             .bk.sent-later {
-#                 font-size: 40px;
-#                 border: 1px solid green;
-#                 background-color: white;
-#             }
-#             </style>
-#     """)
-
-
-
-# a = bk.PreText(text='zzz\nfff\n\nggg', width=400, height=500)
-
-# a.css_classes.append('sent-later')
-
-# bk.show(bk.layout([divTemplate, a]))
-
-# +
-# # log.log?
-# -
-
-
-
-# +
-# a = app1_lib.friz_class()
-
-# a.freeze('zzz')
-
-# def tst():
-    
-#     global a
-    
-#     if a.unfreeze('zzz'): return 
-    
-#     print('ttt')
-
-# tst()    
-# +
-# i = 0
-
-# ttt = []
-
-# def modify_doc(doc):
-    
-    
-    
-#     freeze_select_ccd = False
-    
-#     p = bk.figure()
-    
-    
-    
-#     url755 = 'https://cxc.cfa.harvard.edu/cdaftp/byobsid/5/755/primary/acisf00755N004_full_img2.jpg'
-    
-#     url333 = 'https://cxc.cfa.harvard.edu/cdaftp/byobsid/3/333/primary/acisf00333N003_full_img2.jpg'
-    
-#     z = p.image_url(url=[url755], x=0, y=1, w=1, h=1, visible=True, global_alpha=0.5)
-    
-#     # div_image = bk.Div(text=f"""<img src="{url}" alt="div_image">""", width=450, height=450)
-    
-#     ttt.append(z)
-    
-#     z.data_source.data['url'][0] = url755
-    
-
-#     select_ccd = bk.Select(title='ccd',                            
-#                                value='1',
-#                                options=['1','2','3','4','5'],
-#                                width=50)
-
-#     but = bk.Button(label='clik')
-
-#     def but_callback():
-        
-#         nonlocal freeze_select_ccd
-        
-#         # ccds = get_ccd_folders(new, data_loc_active())
-        
-#         freeze_select_ccd = False
-
-#         select_ccd.options = ['7','8','9']  
-#         select_ccd.value = '7' 
-
-#         print(select_ccd.options, select_ccd.value)
-
-        
-#     def select_ccd_callback(attr, old, new):
-        
-#         nonlocal freeze_select_ccd
-        
-# #         global i 
-        
-# #         i += 1
-                
-#         if freeze_select_ccd:
-#             freeze_select_ccd = False
-#             return
-
-#         # ccds = get_ccd_folders(new, data_loc_active())
-        
-#         # select_ccd.value = str(i)
-
-#         print('zzz')
-
-#     but.on_click(but_callback) 
-#     select_ccd.on_change('value', select_ccd_callback) 
-    
-#     layout = bk.layout(select_ccd, but, p)
-    
-#     doc.add_root(layout)
-
-# bk.show(modify_doc, notebook_url='localhost:1111', port=8911) # change
-# +
-# x = "global"
-
-# def foo():
-#     x = x * 2
-#     print(x)
-
-# foo()
-# -
-
-
-
-# +
-# from urllib.request import urlretrieve
-
-# obsid = 1042
-# ccd = 3
-
-# loc = 'hug'
-
-# holes = True
-
-
-
-# local_fits_dir = fits_dir['local']
-
-# hls = '_holes' if holes else ''
-        
-# evt2_fn = f'{obsid}_{ccd}{hls}_evt2_05_8keV.fits'
-
-# evt2_fn_local = f'{local_fits_dir}/{obsid}/{ccd}/{evt2_fn}'
-
-# if os.path.isfile(evt2_fn_local) or loc=='local':
-#     pass
-# elif loc=='hug':        
-#     url = f'{fits_dir[loc]}/{obsid}/{ccd}/{evt2_fn}'
-    
-#     os.system(f'mkdir -p {local_fits_dir}/{obsid}/{ccd}')
-    
-#     urlretrieve(url, evt2_fn_local)        
-# elif loc=='query':        
-#     status, url, evt2_fn_local = ext_lib.get_evt2_file(obsid, f'{local_fits_dir}/{obsid}')        
-#     if status != 'ok':
-#         sys.exit(status)  
-        
-        
-# scaled_xy = app1_lib.get_data(evt2_fn_local, ccd)    
-
-# +
-# https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data/resolve/main/755/2/755_2_evt2_05_8keV.fits
-
-
-# +
-# # create json with data files structure
-
-# data_dir = '/home/ivv101/oyk/Extended_sources/2022/Chandra-ACIS-clusters-data'
-
-# lst = glob(f'{data_dir}/**/*fits', recursive=True)
-
-# dir_tree = {}
-
-# for f in lst:
-    
-#     obsid, ccd = np.array(f.split('/')[-3:-1], dtype=int).tolist()
-    
-#     if obsid not in dir_tree.keys():        
-#         dir_tree[obsid] = []
-    
-#     if ccd not in dir_tree[obsid]:
-#         dir_tree[obsid].append(ccd)
-#         dir_tree[obsid] = sorted(dir_tree[obsid])
-        
-# dir_tree = dict(sorted(dir_tree.items()))   
-
-# json.dump(dir_tree, open(f'{data_dir}/obsids.json', 'wt'))
-
-# # dir_tree
-# -
-
-
-
-# +
-
-
-
-
-
-
-
-
-
-
-
-# a = np.array([
-#     [ 0,  2, 1],
-#     [ 0,  0, 3],
-#     [ 0,  0, 2],
-#     [-1,  8, 0],
-#     [-6,  7, 0],
-#     [-1,  1, 0]
-# ])
-
-# a[np.lexsort(a[:,::-1].T)] # sorts by first, second etc
-# +
-
-        
-#     def select_ccd_callback_aux():
-                
-#         global frz        
-#         if frz.unfreeze('select_ccd'): return
-    
-#         obsid = select_obsid.value
-#         ccd = select_ccd.value
-        
-#         if ccd == '':    
-#             show_jpg_img(obsid)
-#             p.title.text = obsid            
-#             return
-        
-#         p.title.text = f'{obsid}/{ccd}'
-        
-#         get_ccd_evt2(obsid, ccd)
-        
-#         show_ccd(obsid, ccd)
-    
-        
-#     show_ccd(obsid_ini, ccd_ini) 
-    
-    
-#     def query_button_callback():
-        
-#         global frz        
-#         if frz.unfreeze('query_button'): return
-    
-#         frz.freeze('data_loc_rbg')
-#         data_loc_rbg.active = 1
-        
-#         tbl.visible = False
-        
-#         obsid = query_input.value.rstrip()
-#         obsid_dir = f"{fits_dir['local']}/{obsid}"
-                
-#         if obsid in get_obsid_folders('hug'):
-            
-#             ccds = get_ccd_folders(obsid, 'hug')
-#             ccd = [0]
-            
-#             ccd_dir = f'{obsid_dir}/{ccd}'
-            
-#             holes = True if holes_cb_group.active else False        
-#             hls = '_holes' if holes else ''
-        
-#             fn_ccd = f'{obsid}_{ccd}{hls}_evt2_05_8keV.fits'
-            
-#             fn_ccd_full = f'{ccd_dir}/{fn_ccd}'
-            
-#             if not os.path.isfile(fn_ccd_full):
-                
-#                 os.system(f'mkdir -p {ccd_dir}')
-                
-#                 url = f"{fits_dir['hug']}/{obsid}/{ccd}/{fn_ccd}"  
-                
-#                 urlretrieve(url, fn_ccd_full)  
-                                
-#         else:
-#             if not os.path.isdir(obsid_dir):
-
-#                 debug_info_window.text += f'create obsid {obsid} folder\n'
-
-#                 status, url, evt2_filename = ext_lib.get_evt2_url(obsid) 
-
-#                 debug_info_window.text += status + '\n'        
-
-#                 if status != 'ok':
-#                     msg.text = status            
-#                     return
-
-#                 evt2_filename_full = f'{obsid_dir}/{evt2_filename}'
-
-#                 os.system(f'mkdir -p {obsid_dir}')
-#                 urlretrieve(url, evt2_filename_full)  
-
-#                 with fits.open(evt2_filename_full) as hdul:
-#                     _ = hdul[1].data
-#                     ccds = np.sort(np.unique(_['ccd_id'])).tolist()
-
-#                 [os.system(f'mkdir -p {obsid_dir}/{ccd}') for ccd in ccds]
-
-#             ccds = get_ccd_folders(obsid, 'local') 
-
-#             ccd = ccds[0]      
-
-#             app1_lib.create_fits(obsid, ccd, fits_dir['local'], hls, use_cache)
-                
-#         local_obsids = get_obsid_folders('local')
-        
-#         select_obsid.options = local_obsids
-#         frz.freeze('select_obsid')
-#         select_obsid.value = obsid
-        
-#         select_ccd.options = ccds
-#         frz.freeze('select_ccd')
-#         select_ccd.value = ccd
-        
-        
-        
-#         show_ccd(obsid, ccd)
-        
-                            
-        
-        
-    
-        
-        
-        
-        
-        
-        
-   
-            
-#     def data_loc_rbg_callback(attr, old, new):
-        
-        
-        
-#         global frz              
-#         if frz.unfreeze('data_loc_rbg'): return
-    
-        
-
-# #         obsid = obsids[data_loc_active()][0]
-        
-# #         print(obsid)
-
-
-
-
-
-
-
-#         # frz.comment += f'{data_loc_active()}\n'
-        
-#         cur_obsids = get_obsid_folders(new)
-        
-#         # frz.comment += f'{cur_obsids}\n'
-        
-#         # debug_info_window.text += 'loc: ' + data_loc_active() + '\n' 
-#         # debug_info_window.text += cur_obsids + '\n'     
-                       
-#         select_obsid.options = cur_obsids   
-#         select_obsid.value = cur_obsids[0]
-        
-#         # frz.comment += f'data_loc_rbg_callback done\n'
-        
-        
-        
-        
-        
-        
-#         # select_obsid_callback(0, 0, select_obsid.value)
-                
-#         # cb()
-        
-        
 
