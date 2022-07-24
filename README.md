@@ -1,10 +1,8 @@
 # Installation
 
-1. Clone this repo
+1. Clone this repo and
 
 ```
-git clone https://github.com/ivv101/Chandra-ACIS-clusters-app
-
 cd Chandra-ACIS-clusters-app
 ```
 
