@@ -1,17 +1,17 @@
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
   - bokeh
   - pandas
   - scikit-learn
   - shapely
   - alphashape
-  - astropy
+  - astropy=5 # warns that TCRPX11 etc might be removed from headers in future versions 
   - bs4
   - python-magic
   - kneed
   - hdbscan
+  - pillow
   - pip
   - pip:
     - pca

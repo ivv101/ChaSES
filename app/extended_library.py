@@ -62,7 +62,7 @@ remove_nans = lambda x : x[~np.isnan(np.sum(x, 1))]
 
 # # from expanded_data
 
-def get_evt2_file(obsid, path='.'):
+def get_evt2_file(obsid, path='.', search_mask='evt2'):
     '''
     We assume that there exists a single evt2 file in primary directory in CXC database
     '''
@@ -73,13 +73,13 @@ def get_evt2_file(obsid, path='.'):
     last = str(obsid)[-1]
     primary_url = f'https://cxc.cfa.harvard.edu/cdaftp/byobsid/{last}/{str(obsid)}/primary'
     
-    _ = glob.glob(f'{path}/*{int(obsid):05d}*')
+    _ = glob.glob(f'{path}/*{int(obsid):05d}*{search_mask}*')
     if _: return status, f'{primary_url}/{os.path.basename(_[0])}', _[0]
     
     html_text = requests.get(primary_url).text
     soup = BeautifulSoup(html_text, 'html.parser')
     
-    evt2_list = [_.get('href') for _ in soup.find_all('a') if re.search(r'evt2', _.get('href'))]
+    evt2_list = [_.get('href') for _ in soup.find_all('a') if re.search(search_mask, _.get('href'))]
     if len(evt2_list) != 1:
         print(f'Error: there are {len(evt2_list)} evt2 files: {evt2_list}')
         status = f'{len(evt2_list)} evt2 files: {evt2_list}'

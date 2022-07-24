@@ -24,6 +24,7 @@ from scipy.ndimage import gaussian_filter
 
 from astropy.wcs import WCS
 from astropy.stats import sigma_clipped_stats 
+from astropy.io import fits
 
 from collections import Counter
 
@@ -35,6 +36,13 @@ from sklearn.metrics.cluster import silhouette_samples
 
 # from sklearn.cluster import DBSCAN, OPTICS #, KMeans, SpectralClustering
 # from sklearn.preprocessing import StandardScaler
+
+from glob import glob
+
+from urllib.request import urlretrieve
+
+import os
+import sys
 
 import extended_library as ext_lib
 
@@ -65,14 +73,12 @@ def db_sort(db, n_min=1):
     return db
 
 
-def get_data(obsid, ccd, fits_dir='', holes=True):
-    
-    hls = '_holes' if holes else ''
+def get_data(evt2_fn, ccd):
         
-    evt2_data, head = ext_lib.process_fits(f'{fits_dir}/{obsid}/{ccd}/{obsid}_{ccd}{hls}_evt2_05_8keV.fits')
+    evt2_data, head = ext_lib.process_fits(evt2_fn)
 
     if len(evt2_data)==0:
-        print(f'{obsid}_{ccd} empty')
+        # print(f'{obsid}_{ccd} empty')
         # msg.text = f'{obsid}_{ccd} empty'
         return 'empty'
 
@@ -84,6 +90,27 @@ def get_data(obsid, ccd, fits_dir='', holes=True):
     
     return scaled_xy
 
+
+# +
+# def get_data_old(obsid, ccd, fits_dir='', holes=True):
+    
+#     hls = '_holes' if holes else ''
+        
+#     evt2_data, head = ext_lib.process_fits(f'{fits_dir}/{obsid}/{ccd}/{obsid}_{ccd}{hls}_evt2_05_8keV.fits')
+
+#     if len(evt2_data)==0:
+#         print(f'{obsid}_{ccd} empty')
+#         # msg.text = f'{obsid}_{ccd} empty'
+#         return 'empty'
+
+#     xy = ext_lib.xy_filter_evt2(evt2_data)[f'ccd_{ccd}']
+
+#     scaled_xy = ext_lib.scale(*xy.T)
+    
+#     scaled_xy['head'] = head
+    
+#     return scaled_xy
+# -
 
 def get_hull(clusters, alpha):
 
@@ -135,10 +162,108 @@ def nbins_sigma_func(X, nbins, sigma):
     return H, bkg_dens
 
 
-def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all', 
-                args_func={}, nbins=100, sigma=3, alpha=1, fits_dir=''):
+# +
+# obsid = 88
+# ccd = 0
 
-    scaled_xy = get_data(obsid, ccd, fits_dir, holes)
+# loc = 'hug'
+
+# holes = True
+
+# fff = {'local': '/home/ivv101/oyk/Extended_sources/2022/Chandra-ACIS-clusters-app/data',
+#  'hug': 'https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data/resolve/main'}
+
+# local_fits_dir = fff['local']
+
+# fits_dir = fff[loc]
+
+# hls = '_holes' if holes else ''
+
+# args_func = {
+#             'eps': 2.7, 
+#             'min_samples': 46
+#         }
+
+# dat = process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all', 
+#                 args_func=args_func, nbins=100, sigma=3, alpha=1, fits_dir=fits_dir, local_fits_dir=local_fits_dir, loc=loc)
+# -
+
+def create_fits(obsid, ccd, fits_dir, hls, cache=False):
+    
+    obsid_dir = f'{fits_dir}/{obsid}'
+    fn_ccd = f'{obsid_dir}/{ccd}/{obsid}_{ccd}{hls}_evt2_05_8keV.fits'
+        
+    if cache and os.path.isfile(fn_ccd):
+        return
+    
+    fn = glob(f'{obsid_dir}/*fits*')[0]
+
+    with fits.open(fn) as hdul:
+
+        # hdul.info()
+        X = hdul[1].data
+        head = hdul[1].header
+    
+    cols = ['ccd_id', 'x', 'y', 'energy']
+    ccds = np.sort(np.unique(X['ccd_id'])).tolist()
+
+    mask = (500 < X['energy']) & (X['energy'] < 8000)
+
+    X = np.array(X)[mask][cols]
+
+    X = X[X['ccd_id']==int(ccd)]
+    
+    bt = fits.BinTableHDU(X, head)
+    bt.name = 'EVENTS'
+    
+    bt.writeto(fn_ccd, overwrite=True)
+
+
+# +
+def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all', 
+                args_func={}, nbins=100, sigma=3, alpha=1, local_fits_dir=''):
+    
+    
+    '''
+        holes=True not implemented for query or local custom (ciao...)
+    
+    '''
+    
+    hls = '_holes' if holes else ''        
+    evt2_fn = f'{obsid}_{ccd}{hls}_evt2_05_8keV.fits'
+    
+    evt2_fn_local = f'{local_fits_dir}/{obsid}/{ccd}/{evt2_fn}'
+    
+#     if os.path.isfile(evt2_fn_local):
+#         print('pass')
+#         pass 
+    
+#     elif loc=='hug':        
+#         url = f'{fits_dir}/{obsid}/{ccd}/{evt2_fn}'    
+#         # print('url')
+#         os.system(f'mkdir -p {local_fits_dir}/{obsid}/{ccd}')
+#         # print('done mkdir')
+#         urlretrieve(url, evt2_fn_local)   
+        
+#     elif loc=='local':
+        
+#         evt2_fn = f'{obsid}_{ccd}_evt2_05_8keV.fits' # no holes
+#         evt2_fn_local = f'{local_fits_dir}/{obsid}/{ccd}/{evt2_fn}'
+        
+#         if not os.path.isfile(evt2_fn_local):
+            
+#             create_fits(obsid, ccd, local_fits_dir, cache=True) 
+        
+    # elif loc=='query':        
+    #     status, url, evt2_fn_local = ext_lib.get_evt2_file(obsid, f'{local_fits_dir}/{obsid}')        
+    #     if status != 'ok':
+    #         sys.exit(status)   
+            
+    scaled_xy = get_data(evt2_fn_local, ccd)    
+    
+    # scaled_xy = get_scaled_xy(obsid, ccd, holes=holes, fits_dir=fits_dir, local_fits_dir=local_fits_dir, loc=loc)    
+
+    # scaled_xy = get_data_old(obsid, ccd, fits_dir=fits_dir, holes=holes)
     
     if scaled_xy=='empty':
         return 'empty'
@@ -220,7 +345,10 @@ def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all',
     w.wcs.ctype = [h['TCTYP11'], h['TCTYP12']]
     w.wcs.cunit = [h['TCUNI11'], h['TCUNI12']]
     w.wcs.radesys = 'ICRS'
-    w.wcs.mjdobs = h['MJD-OBS']
+    try:
+        w.wcs.mjdobs = h['MJD-OBS']
+    except:
+        w.wcs.mjdobs = h['MJD_OBS']
     w.wcs.dateobs = h['DATE-OBS']
 
     data['ra'], data['dec'] = w.wcs_pix2world(com.T, 1).T
@@ -229,3 +357,66 @@ def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all',
                          [X, len_X_orig, db, n_clusters, bkg_dens, clusters, H])))
 
     return data # no filtering by sigma_min
+
+
+# -
+
+class loop_class:
+    
+    sp = ''.join([' ']*100)
+        
+    def __init__(self, lst):
+
+        self.t0 = timer()
+        self.n = len(lst) 
+        self.tt = []
+                
+    def __call__(self):
+        t = timer()
+        self.tt.append(t)
+        
+        k = len(self.tt)
+        
+        perc = 100 * k / self.n
+    
+        rem = int((self.n - k) * (t - self.t0) / k)
+        
+        print(f'\r{self.sp}', end='')
+
+        if k < self.n:    
+            msg = f'\r{k}/{self.n}: {perc:.1f}%, {timedelta(seconds=rem)} remaining'    
+        else:
+            msg = f'\r{self.n} done, {timedelta(seconds=int(t - self.t0))} total'
+
+        print(msg, end='', flush=True)    
+
+
+class friz_class:
+    
+    def __init__(self, history=False, inactive=False): 
+                        
+        self.data = {}        
+        self.pref = '' if not inactive else 'INACTIVE'
+        
+        self.comment = ''
+        
+        self.inactive = inactive
+                
+        if history:        
+            self.history = []
+        
+    def freeze(self, model):
+        self.data[model] = True if not self.inactive else False
+        self.history.append(f'{model} freeze {self.pref}')
+        
+    def unfreeze(self, model):
+        
+        if model in self.data and self.data[model]==True:
+            self.data[model] = False
+            self.history.append(f'{model} unfreeze {self.pref}')
+            return True
+        else:
+            self.history.append(f'{model} passed {self.pref}')
+            return False    
+
+
