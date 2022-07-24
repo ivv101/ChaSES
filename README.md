@@ -1,6 +1,36 @@
-# Running a bokeh server with Binder
+# Installation
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ivv101/tst/main?urlpath=/proxy/5006/bokeh-app)
+1. Clone this repo
+
+```
+git clone https://github.com/ivv101/Chandra-ACIS-clusters-app
+
+cd Chandra-ACIS-clusters-app
+```
+
+1. [optional] Create environment
+
+```
+mamba create -n Chandra-ACIS-clusters-app-env
+mamba activate Chandra-ACIS-clusters-app-env
+```
+
+2. Install dependencies
+
+```
+mamba env update --file environment.yml
+```
+
+3. Run Bokeh server
+
+```
+bokeh serve app/app1.py --show
+```
+
+
+
+
+<!-- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ivv101/tst/main?urlpath=/proxy/5006/bokeh-app)
 
 
 This repository demonstrates how to run a Bokeh server from within Binder. To do so, we did the following things:
@@ -17,3 +47,4 @@ This repository demonstrates how to run a Bokeh server from within Binder. To do
    ```
    
 When people click on the Binder link, they should be directed to the running Bokeh app.
+ -->
