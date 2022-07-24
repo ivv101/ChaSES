@@ -159,11 +159,13 @@ hug_dir = 'https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data/res
 hug_tree = json.load(urlopen(f'{hug_dir}/obsids.json'))
 
 # +
-
-
 upper_dir = '/'.join(notebook_dir.split('/')[:-1])
 
 cache_dir = f'{upper_dir}/cache' # 'app_cache'
+
+print(cache_dir)
+
+os.system(f'mkdir -p {cache_dir}')
 
 # fits_dir = '../data' #'/mnt/data_ssd/holes'
 
@@ -694,9 +696,13 @@ def modify_doc(doc):
             local_obsids = np.sort(local_obsids + [obsid]).tolist()  
                     
         select_obsid.options = local_obsids   
-                    
+        
+        frz.freeze('select_obsid')
         select_obsid.value = obsid
-                
+        frz.unfreeze('select_obsid')
+        
+        select_obsid_callback_aux()
+        
     def query_button_callback():
         msg.text = 'downloading obsid ...'
         doc.add_next_tick_callback(query_button_callback_aux)

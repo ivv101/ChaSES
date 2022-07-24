@@ -12,6 +12,7 @@ dependencies:
   - kneed
   - hdbscan
   - pillow
+  - requests
   - pip
   - pip:
     - pca
