@@ -27,6 +27,10 @@ mamba env update --file environment.yml
 bokeh serve app/app1.py --show
 ```
 
+Selected obsids with compact objects removed are in 🤗 Hugging Face:
+
+* [Chandra-ACIS-clusters-data](https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data)
+
 
 
 
