@@ -843,7 +843,7 @@ def modify_doc(doc):
 if is_interactive():
     
     if os.uname()[1]=='bobr970':
-        bk.show(modify_doc, notebook_url='localhost:1111', port=8910) # change
+        bk.show(modify_doc, notebook_url='localhost:1111', port=8912) # change
     else:
         bk.show(modify_doc)
 else:
