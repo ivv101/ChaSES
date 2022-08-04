@@ -13,7 +13,10 @@
 #     name: conda-env-p39-py
 # ---
 
-# same as test2, added Nikolay Oskolkov https://towardsdatascience.com/how-to-cluster-in-high-dimensions-4ef693bacc6
+# +
+# from IPython.display import display,Javascript
+# Javascript('document.title="{}"'.format('my_jupy_env'))
+# -
 
 def is_interactive():
     import __main__ as main
@@ -257,11 +260,11 @@ def modify_doc(doc):
     
     holes_cb_group = bk.CheckboxButtonGroup(labels=['holes'], active=[0], width=70, margin=(0, -1, 0, 0))
     n_max_cb_group = bk.CheckboxButtonGroup(labels=['n_max'], active=[0], width=70, margin=(0, -1, 0, 0))
-    cache_cb_group = bk.CheckboxButtonGroup(labels=['cache'], active=[0], width=70, margin=(0, -1, 0, 0))
+    cache_cb_group = bk.CheckboxButtonGroup(labels=['cache'], active=[0], width=70, margin=(0, -1, 0, 0), visible=False)
     
     cb_group = bk.row([holes_cb_group, n_max_cb_group, cache_cb_group])
         
-    data_loc_rbg = bk.RadioButtonGroup(labels=['hug', 'local'], active=1, width=200)    
+    data_loc_rbg = bk.RadioButtonGroup(labels=['pre-computed', 'local'], active=1, width=200)    
     data_loc_active = lambda :  data_loc_rbg.labels[data_loc_rbg.active]
             
     query_input = bk.TextInput(value='', placeholder='obsid', width=100)
@@ -275,7 +278,7 @@ def modify_doc(doc):
     
     tbl_source = bk.ColumnDataSource()
     tbl = bk.DataTable(source=tbl_source, visible=False) 
-    save_table_button = bk.Button(label='save table as csv', width=100, visible=False)  
+    save_table_button = bk.Button(label='save table as csv', width=100, visible=False, button_type='success')  
     
     sigma_slider = bk.Slider(start=0, end=3, value=1, step=0.01, title='sigma', width=100)
     nbins_slider = bk.Slider(start=1, end=200, value=100, step=1, title='nbins', width=100)
@@ -325,6 +328,21 @@ def modify_doc(doc):
                            value=ccd_ini,
                            options=[''] + ccds,
                            width=50)
+    
+    
+    saved_div = bk.Div(text='', visible=False)
+    
+    title = bk.Div(text='<b>Search for extended sources in Chandra ACIS images</b>', style={'font-size': '200%', 'color': 'black'})
+
+    # cite = bk.Div(text=q['cite_text'], width=1000, margin=(5, 5, 0, 5))
+
+    # description = bk.Div(text=q['description_text'], style={'font-size': '150%'}, width=1000)
+
+    ackn = bk.Div(text='Support for this work was provided by NASA through Chandra X-ray Observatory Award AR8-19008X.')
+
+    # contact = bk.Div(text=q['contact_text'])
+
+    # version = bk.Div(text=version_text)
 
     
     def show_jpg_img(obsid, path=fits_dir['local']):
@@ -462,6 +480,8 @@ def modify_doc(doc):
                 
         global frz        
         if frz.unfreeze('select_ccd'): return
+    
+        saved_div.visible = False
     
         clear_clusters()
     
@@ -641,19 +661,33 @@ def modify_doc(doc):
         
     #qqq
     
+    
+    
     def save_table_button_callback():
-        global frz
         
+        global frz
+                
         data = tbl_source.data
         
-        frz.comment = data
+        obsid = select_obsid.value
+        ccd = select_ccd.value
+        
+        pd.DataFrame(data).reset_index(drop=True).to_csv(f'{cache_dir}/{obsid}_{ccd}.csv')  
+        
+        saved_div.visible = True
+        saved_div.text = f'saved as {cache_dir}/{obsid}_{ccd}.csv'
+        
+        #qqq
                 
-    save_table_button.on_click(save_table_button__callback)    
+    save_table_button.on_click(save_table_button_callback)    
            
     def apply_button_callback_aux():
         
         global frz        
         if frz.unfreeze('apply_button'): return
+    
+        saved_div.visible = False
+        saved_div.text = ''
                         
         obsid = select_obsid.value
         ccd = select_ccd.value
@@ -709,7 +743,7 @@ def modify_doc(doc):
         
         hls = '_holes' if holes_cb_group.active else '' 
         
-        pkl.dump(X, open(f'{cache_dir}/X_{obsid}_{ccd}{hls}.pkl', 'wb'))
+        # pkl.dump(X, open(f'{cache_dir}/X_{obsid}_{ccd}{hls}.pkl', 'wb'))
                                    
         n_clusters_text = f'\n{n_clusters} clusters'
         if n_clusters==1:
@@ -764,75 +798,17 @@ def modify_doc(doc):
         doc.add_next_tick_callback(all_done_func)
                         
     apply_button.on_click(apply_button_callback)
-        
-#     process_all_button = bk.Button(label='Process all', button_type='primary', width=100) 
-    
-#     def process_all_button_callback():
-        
-#         # global glb
-        
-#         bad_obsids_ccd = []
-        
-#         all_dir = f'{cache_dir}/all'
-        
-#         loop_progress = cxo_lib.loop_class(obsids)
-        
-#         for obsid in obsids:
-            
-#             loc = data_loc_active()
-            
-#             ccds = get_ccd_folders(obsid)
-            
-#             # ccds = get_folders(obsid)
-            
-#             # process_all_button.label = f'{i}/{len(obsids)}''
-            
-#             for ccd in ccds:
                 
-#                 select_obsid.value = obsid
-#                 select_ccd.value = ccd
-                
-#                 try:
-#                     res = apply_button_callback()
-#                 except:
-#                     bad_obsids_ccd.append([obsid, ccd, 'error'])
-#                     continue
-                
-#                 if res == 'empty':
-#                 #     # print(f'{obsid}_{ccd} empty')
-#                     bad_obsids_ccd.append([obsid, ccd, 'empty'])
-#                     continue
-                
-#                 hls = '_holes' if holes_cb_group.active else ''
-                                                
-#                 os.system(f'cd {notebook_dir}; mkdir -p {all_dir}')
-                
-#                 tbl_json = json.loads(pd.DataFrame(tbl_source.data).to_json(orient='split', index=False, indent=4))
-#                 json.dump(tbl_json, open(f'{all_dir}/{obsid}_{ccd}{hls}.json', 'wt'))
-                
-#                 # glb = tbl_json
-                  
-#                 _ = clus_source_filtered.data.copy()    
-#                 pkl.dump(_, open(f'{all_dir}/{obsid}_{ccd}{hls}.pkl', 'wb'))
-                
-#                 bk.export_png(p, filename=f'{all_dir}/{obsid}_{ccd}{hls}.png')  
-                
-#                 # print(f'{obsid}_{ccd} done')
-                
-#             loop_progress()
-            
-#         pkl.dump(bad_obsids_ccd, open(f'{cache_dir}/bad_obsids_ccd.pkl', 'wb'))    
-        
-#     process_all_button.on_click(process_all_button_callback)    
-        
     row1 = bk.row([select_obsid, select_ccd, len_pre], width=800)
+    
+    input_div = bk.Div(text='<input id="file-input" type="file">')
     
     settings_column = bk.column([msg, bk.row(apply_button), #process_all_button), 
                                  bk.row(data_loc_rbg, bk.Spacer(width=100), bk.row(query_input, query_button)), 
-                                 row1, cb_group, eps_slider, slider_min_samples, tbl, divTemplate, debug_info_window])
+                                 row1, cb_group, eps_slider, slider_min_samples, save_table_button, saved_div, tbl, divTemplate, debug_info_window])
     # save_table_button
-    layout = bk.row([bk.column([p, bk.row(select_pallette, pal_reverse_checkbox, min_sigma_slider), 
-                                bk.row(opacity_slider, alpha_slider), bk.row(nbins_slider, sigma_slider)]), settings_column])
+    layout = bk.row(bk.column([title, ackn, p, bk.row(select_pallette, pal_reverse_checkbox, min_sigma_slider), 
+                                bk.row(opacity_slider, alpha_slider), bk.row(nbins_slider, sigma_slider)]), settings_column)
     
     doc.add_root(layout)
     
@@ -843,13 +819,15 @@ def modify_doc(doc):
 if is_interactive():
     
     if os.uname()[1]=='bobr970':
-        bk.show(modify_doc, notebook_url='localhost:1111', port=8912) # change
+        bk.show(modify_doc, notebook_url='localhost:1111', port=8910) # change
     else:
         bk.show(modify_doc)
 else:
     modify_doc(bk.curdoc())
 
-print(frz.history)
-print(frz.comment)
+# +
+# print(frz.history)
+# print(frz.comment)
+# -
 
 

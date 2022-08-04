@@ -44,6 +44,8 @@ from urllib.request import urlretrieve
 import os
 import sys
 
+from mpmath import mp
+
 import extended_library as ext_lib
 
 
@@ -152,12 +154,7 @@ def nbins_sigma_func(X, nbins, sigma):
     H = gaussian_filter(H, sigma=sigma)            
 
     mean, median, std = sigma_clipped_stats(H, sigma=3.0)
-    # print((mean, median, std), bkg_dens) 
-
     bkg_dens = median * nbins**2
-
-    # print('len_X:', len(X_source.data['X']))
-    # print('bkg_dens:', bkg_dens)
 
     return H, bkg_dens
 
@@ -217,6 +214,31 @@ def create_fits(obsid, ccd, fits_dir, hls, cache=False):
     bt.name = 'EVENTS'
     
     bt.writeto(fn_ccd, overwrite=True)
+
+
+def get_signif_sigma(k, mu, N, max_dps=2000):
+        
+    mp.pretty = True
+    
+    mp.dps = 25
+    
+    p = 0
+    
+    while p==0 and mp.dps<=max_dps:
+    
+        cdf = mp.gammainc(k, mu, regularized=True)
+    
+        p = 1 - cdf**N
+    
+        mp.dps *= 2
+    
+    sigma = np.sqrt(2) * mp.erfinv(1-p)
+    
+    dps = mp.dps 
+    
+    # mp.dps = 3
+    
+    return float(p), float(sigma)
 
 
 # +
@@ -321,20 +343,39 @@ def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all',
         
     data['silhouette'] = silhs    
 
-    H, bkg_dens = nbins_sigma_func(X, nbins, sigma)
-
+    H, _ = nbins_sigma_func(X, nbins, sigma) # using bkg_dens defined below
+        
+    
+        
     com = np.transpose([np.mean(c, 0).tolist() for c in clusters])  
     data['x_scaled'], data['y_scaled'] = com
     
     com = ext_lib.unscale(*com, scaled_xy['pars'])
-
     data['x'], data['y'] = com
 
-    data['n-n_bkg'] = [len(c) - bkg_dens * a for c, a in zip(clusters, data['area'])]
-
-    data['signif.'] = [1 - skellam.cdf(x, len(X) * a, bkg_dens * a) for x, a in zip(data['n-n_bkg'], data['area'])]
-
-    data['sigmas'] = [ndtri(1-_/2) for _ in data['signif.']]
+    data['n-n_bkg'] = []
+    data['signif.'] = []
+    data['sigmas'] = []
+        
+    bkg_dens = (len(X) - len(np.concatenate(clusters))) / (1 - np.sum(data['area']))
+    
+    for c, a in zip(clusters, data['area']):
+        
+        n = len(c)
+        n_bkg = bkg_dens * a
+                
+        p, sigma = get_signif_sigma(n, n_bkg, 1/a)
+        
+        data['n-n_bkg'].append(n - n_bkg)
+        data['signif.'].append(p)
+        data['sigmas'].append(sigma)
+        
+    # data['signif.'] = [1 - skellam.cdf(x, len(X) * a, bkg_dens * a) for x, a in zip(data['n-n_bkg'], data['area'])]
+    # data['sigmas'] = [ndtri(1-_/2) for _ in data['signif.']]
+    
+#     import pickle as pkl
+    
+#     pkl.dump([X, clusters, data], open('tmp.pkl', 'wb'))
 
     h = scaled_xy['head']
 
