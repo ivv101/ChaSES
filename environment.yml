@@ -13,6 +13,7 @@ dependencies:
   - hdbscan
   - pillow
   - requests
+  - mpmath
   - pip
   - pip:
     - pca
