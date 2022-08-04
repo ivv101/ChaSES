@@ -108,7 +108,9 @@ def get_table(data):
     data is dict
     '''
 
-    props = ['color', 'silhouette', 'area', 'n-n_bkg', 'signif.', 'sigmas', 'x', 'y', 'ra', 'dec']
+    # props = ['color', 'silhouette', 'area', 'n-n_bkg', 'signif.', 'sigmas', 'x', 'y', 'ra', 'dec']
+    
+    props = ['color', 'silhouette', 'area', 'n-n_bkg', 'sigmas', 'x', 'y', 'ra', 'dec']
 
     tbl_data = {k: data[k] for k in props}
 
@@ -240,6 +242,8 @@ DEBUG_WINDOW = False
 
 len_pre_VISIBLE = False
 
+scaled_pars = {}
+
 def modify_doc(doc):    
     
     divTemplate = bk.Div(text="""
@@ -278,7 +282,9 @@ def modify_doc(doc):
     
     tbl_source = bk.ColumnDataSource()
     tbl = bk.DataTable(source=tbl_source, visible=False) 
-    save_table_button = bk.Button(label='save table as csv', width=100, visible=False, button_type='success')  
+    save_table_button = bk.Button(label='save table', width=100, visible=False, button_type='success') 
+    
+    save_regions_button = bk.Button(label='save regions', width=100, visible=False, button_type='success') 
     
     sigma_slider = bk.Slider(start=0, end=3, value=1, step=0.01, title='sigma', width=100)
     nbins_slider = bk.Slider(start=1, end=200, value=100, step=1, title='nbins', width=100)
@@ -330,7 +336,7 @@ def modify_doc(doc):
                            width=50)
     
     
-    saved_div = bk.Div(text='', visible=False)
+    save_div = bk.Div(text='', visible=False)
     
     title = bk.Div(text='<b>Search for extended sources in Chandra ACIS images</b>', style={'font-size': '200%', 'color': 'black'})
 
@@ -376,6 +382,7 @@ def modify_doc(doc):
         text_source.data = dict(x=[], y=[], text=[])
         tbl.visible = False 
         save_table_button.visible = False 
+        save_regions_button.visible = False
         img.data_source.data['image'] = []
     
     def select_obsid_callback_aux():
@@ -481,7 +488,7 @@ def modify_doc(doc):
         global frz        
         if frz.unfreeze('select_ccd'): return
     
-        saved_div.visible = False
+        save_div.visible = False
     
         clear_clusters()
     
@@ -525,6 +532,7 @@ def modify_doc(doc):
                     
         tbl.visible = False
         save_table_button.visible = False 
+        save_regions_button.visible = False
         
         obsid = query_input.value.rstrip()
                         
@@ -659,10 +667,6 @@ def modify_doc(doc):
             
     pal_reverse_checkbox.on_change('active', pal_reverse_checkbox_callback)
         
-    #qqq
-    
-    
-    
     def save_table_button_callback():
         
         global frz
@@ -672,22 +676,49 @@ def modify_doc(doc):
         obsid = select_obsid.value
         ccd = select_ccd.value
         
-        pd.DataFrame(data).reset_index(drop=True).to_csv(f'{cache_dir}/{obsid}_{ccd}.csv')  
+        pd.DataFrame(data).reset_index(drop=True).to_csv(f'{cache_dir}/{obsid}_{ccd}_table.csv')  
         
-        saved_div.visible = True
-        saved_div.text = f'saved as {cache_dir}/{obsid}_{ccd}.csv'
-        
-        #qqq
+        save_div.visible = True
+        save_div.text = f'table saved as cache/{obsid}_{ccd}_table.csv'
+
                 
-    save_table_button.on_click(save_table_button_callback)    
+    save_table_button.on_click(save_table_button_callback) 
+        
+    def save_regions_button_callback():
+        
+        global scaled_pars
+        global frz
+        
+        obsid = select_obsid.value
+        ccd = select_ccd.value
+        
+        polygons = 'physical\n'
+        
+        data = clus_source_filtered.data
+
+        for i, (xx, yy) in enumerate(zip(data['xs'], data['ys'])):
+
+            xy = ext_lib.unscale(xx[0][0], yy[0][0], scaled_pars).T
+
+            polygons += 'polygon(' + ','.join(np.ravel(xy).astype(str)) + ') # text={' + str(i) + '}\n'
+
+        with open(f'{cache_dir}/{obsid}_{ccd}_regions.reg', 'wt') as _:
+            _.write(polygons)
+            
+        save_div.visible = True
+        save_div.text = f'regions saved as cache/{obsid}_{ccd}_regions.reg'    
+                
+    save_regions_button.on_click(save_regions_button_callback)
            
     def apply_button_callback_aux():
+        
+        global scaled_pars
         
         global frz        
         if frz.unfreeze('apply_button'): return
     
-        saved_div.visible = False
-        saved_div.text = ''
+        save_div.visible = False
+        save_div.text = ''
                         
         obsid = select_obsid.value
         ccd = select_ccd.value
@@ -703,9 +734,10 @@ def modify_doc(doc):
             'min_samples': slider_min_samples.value
         }
                         
-        res = app1_lib.process_ccd(obsid, ccd, 
+        res, scaled_pars = app1_lib.process_ccd(obsid, ccd, 
                                    holes=holes, 
-                                   n_lim=n_lim, n_max=n_max, 
+                                   n_lim=n_lim, 
+                                   n_max=n_max, 
                                    args_func=args_func, 
                                    nbins=nbins_slider.value, 
                                    sigma=sigma_slider.value,
@@ -722,6 +754,8 @@ def modify_doc(doc):
             debug_info_window.text += f'emptyyyy\n'
             
             return 'empty'
+        
+        # scaled_pars = res['scale_pars']
         
         new_data = res
         
@@ -764,7 +798,7 @@ def modify_doc(doc):
             
         colors[0] = cxo_lib.rgb2hex(0, 255, 255) # turquoise   
         
-        msg.text = f'len_X: {len(X)}, bkg: {bkg_dens}'
+        # msg.text = f'len_X: {len(X)}, bkg: {bkg_dens}'
                                     
         new_data.update({'clusters': clusters, 'color': colors.tolist()})
         
@@ -789,6 +823,7 @@ def modify_doc(doc):
         
         tbl.visible = True
         save_table_button.visible = True
+        save_regions_button.visible = True
         
         return 'success'
     
@@ -805,8 +840,9 @@ def modify_doc(doc):
     
     settings_column = bk.column([msg, bk.row(apply_button), #process_all_button), 
                                  bk.row(data_loc_rbg, bk.Spacer(width=100), bk.row(query_input, query_button)), 
-                                 row1, cb_group, eps_slider, slider_min_samples, save_table_button, saved_div, tbl, divTemplate, debug_info_window])
-    # save_table_button
+                                 row1, cb_group, eps_slider, slider_min_samples, 
+                                 bk.row(save_table_button, save_regions_button), save_div, tbl, divTemplate, debug_info_window])
+    
     layout = bk.row(bk.column([title, ackn, p, bk.row(select_pallette, pal_reverse_checkbox, min_sigma_slider), 
                                 bk.row(opacity_slider, alpha_slider), bk.row(nbins_slider, sigma_slider)]), settings_column)
     
@@ -830,4 +866,35 @@ else:
 # print(frz.comment)
 # -
 
+X, clusters, data = pkl.load(open('tmp.pkl', 'rb'))
 
+len(data['xs'])
+
+# +
+# ext_lib.unscale??
+# -
+
+scaled_pars
+
+# +
+polygons = 'physical\n'
+
+for i, (xx, yy) in enumerate(zip(data['xs'], data['ys'])):
+    
+    xy = ext_lib.unscale(xx[0][0], yy[0][0], scaled_pars).T
+    
+    polygons += 'polygon(' + ','.join(np.ravel(xy).astype(str)) + ') # text={' + str(i) + '}\n'
+    
+with open()    
+
+
+
+
+
+
+
+# -
+
+print(polygons)
+
+polygons

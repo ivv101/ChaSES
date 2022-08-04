@@ -344,9 +344,7 @@ def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all',
     data['silhouette'] = silhs    
 
     H, _ = nbins_sigma_func(X, nbins, sigma) # using bkg_dens defined below
-        
-    
-        
+                
     com = np.transpose([np.mean(c, 0).tolist() for c in clusters])  
     data['x_scaled'], data['y_scaled'] = com
     
@@ -397,7 +395,7 @@ def process_ccd(obsid, ccd, holes=True, n_lim=True, n_max='all',
     data.update(dict(zip(['X', 'len_X_orig', 'db', 'n_clusters', 'bkg_dens', 'clusters', 'H'], 
                          [X, len_X_orig, db, n_clusters, bkg_dens, clusters, H])))
 
-    return data # no filtering by sigma_min
+    return data, scaled_xy['pars'] # no filtering by sigma_min
 
 
 # -
