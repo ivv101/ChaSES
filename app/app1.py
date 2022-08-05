@@ -864,37 +864,3 @@ else:
 # +
 # print(frz.history)
 # print(frz.comment)
-# -
-
-X, clusters, data = pkl.load(open('tmp.pkl', 'rb'))
-
-len(data['xs'])
-
-# +
-# ext_lib.unscale??
-# -
-
-scaled_pars
-
-# +
-polygons = 'physical\n'
-
-for i, (xx, yy) in enumerate(zip(data['xs'], data['ys'])):
-    
-    xy = ext_lib.unscale(xx[0][0], yy[0][0], scaled_pars).T
-    
-    polygons += 'polygon(' + ','.join(np.ravel(xy).astype(str)) + ') # text={' + str(i) + '}\n'
-    
-with open()    
-
-
-
-
-
-
-
-# -
-
-print(polygons)
-
-polygons
