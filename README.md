@@ -1,3 +1,20 @@
+![](f1.png)
+
+# About
+
+This project provides Python code allowing to search for extended 
+sources in Chandra X-ray Observatory ACIS images using 
+DBSCAN cluster detection algorithm. The python code uses Bokeh 
+library to produce a convenient and interactive 
+graphical user interface (GUI) which will run on 
+Bokeh server in user's default browser (Chrome is recommended). 
+The clustering search is done on-the-fly by selecting 
+the desired algorithm and visualization parameters in the GUI. 
+The outcome of the search is shown graphically as well as in the 
+tabular form. It includes the coordinates of found 
+extended sources and their detection significances. 
+The corresponding regions can be exported in SAO DS9 format.
+
 # Installation
 
 1. Clone this repo and
