@@ -1,4 +1,4 @@
-[![Binder](https://mybinder.org/badge_logo.svg)](https://hub.gke2.mybinder.org/user/ivv101-chases-ftgal3pq/proxy/5006/app)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ivv101/ChaSES/main?urlpath=/proxy/5006/app)
 
 ![](f1.png)
 
