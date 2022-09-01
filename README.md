@@ -1,5 +1,3 @@
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ivv101/ChaSES/main?urlpath=/proxy/5006/app)
-
 ![](f1.png)
 
 # About
@@ -16,6 +14,10 @@ The outcome of the search is shown graphically as well as in the
 tabular form. It includes the coordinates of found 
 extended sources and their detection significances. 
 The corresponding regions can be exported in SAO DS9 format.
+
+The app can be run on Binder without installation:
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ivv101/ChaSES/main?urlpath=/proxy/5006/app)
 
 # Installation
 
