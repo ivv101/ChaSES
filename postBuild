@@ -1,3 +1,5 @@
+# from https://github.com/binder-examples/bokeh
+
 # enable jupyter_server_proxy
 jupyter serverextension enable --sys-prefix jupyter_server_proxy
 # install the bokeh server extension so that
