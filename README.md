@@ -43,7 +43,7 @@ mamba env update --file environment.yml
 3. Run Bokeh server
 
 ```
-bokeh serve app/app1.py --show
+bokeh serve app/main.py --show
 ```
 
 Selected 1042 Chandra ACIS ObsIDs with point sources removed are available at 🤗 Hugging Face:
