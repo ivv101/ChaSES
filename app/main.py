@@ -147,7 +147,7 @@ def get_table(data):
 
 
 # +
-hug_dir = 'https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data/resolve/main'
+hug_dir = 'https://huggingface.co/datasets/oyk100/ChaSES-data/resolve/main'
 
 hug_tree = json.load(urlopen(f'{hug_dir}/obsids.json'))
 
@@ -162,7 +162,7 @@ os.system(f'mkdir -p {cache_dir}')
 
 fits_dir = {
     'local': f'{upper_dir}/data', #'/mnt/data_ssd/holes'
-    'hug': 'https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data/resolve/main'
+    'hug': hug_dir
 }
 
 n_max = 20_000   
@@ -680,7 +680,6 @@ def modify_doc(doc):
         
         save_div.visible = True
         save_div.text = f'table saved as cache/{obsid}_{ccd}_table.csv'
-
                 
     save_table_button.on_click(save_table_button_callback) 
         

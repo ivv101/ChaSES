@@ -24,14 +24,14 @@ The app can be run on Binder without installation:
 1. Clone this repo and
 
 ```
-cd Chandra-ACIS-clusters-app
+cd ChaSES
 ```
 
 2. [optional] Create environment
 
 ```
-mamba create -n Chandra-ACIS-clusters-app-env
-mamba activate Chandra-ACIS-clusters-app-env
+mamba create -n ChaSES
+mamba activate ChaSES
 ```
 
 2. Install dependencies
@@ -48,7 +48,7 @@ bokeh serve app/app1.py --show
 
 Selected 1042 Chandra ACIS ObsIDs with point sources removed are available at 🤗 Hugging Face:
 
-* [Chandra-ACIS-clusters-data](https://huggingface.co/datasets/oyk100/Chandra-ACIS-clusters-data)
+* [ChaSES-data](https://huggingface.co/datasets/oyk100/ChaSES-data)
 
 
 
