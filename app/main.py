@@ -847,7 +847,7 @@ def modify_doc(doc):
     
     doc.add_root(layout)
     
-    doc.title = 'Sliders'
+    doc.title = 'ChaSES'
        
     # bk.export_png(p, filename=f'{save_dir}/{obsid_ccd}{hls}_blur.png')
 # -
