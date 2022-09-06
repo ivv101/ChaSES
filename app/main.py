@@ -349,6 +349,8 @@ def modify_doc(doc):
     # contact = bk.Div(text=q['contact_text'])
 
     # version = bk.Div(text=version_text)
+    
+    X_source = bk.ColumnDataSource({'X': [], 'db': []})
 
     
     def show_jpg_img(obsid, path=fits_dir['local']):
@@ -471,6 +473,8 @@ def modify_doc(doc):
         scaled_xy = app1_lib.get_data(evt2_fn_full, ccd)
         
         X = scaled_xy['X'].copy()
+        
+        X_source.data['X'] = X
         
         H, bkg_dens = app1_lib.nbins_sigma_func(X, nbins_slider.value, sigma_slider.value)
         
@@ -626,14 +630,14 @@ def modify_doc(doc):
         
         img.glyph.color_mapper.palette = pallettes_dict[new]
                      
-    select_pallette.on_change('value', select_pallette_callback)
-    
-    X_source = bk.ColumnDataSource({'X': [], 'db': []})
+    select_pallette.on_change('value', select_pallette_callback) 
                         
     def nbins_sigma_slider_callback(attr, old, new):
+        
+        # frz.history.append(X_source.data['X'])
                 
         H, bkg_dens = app1_lib.nbins_sigma_func(X_source.data['X'], nbins_slider.value, sigma_slider.value)
-              
+                      
         img.data_source.data['image'] = [H.T]
                 
     sigma_slider.on_change('value', nbins_sigma_slider_callback)                       
@@ -863,3 +867,6 @@ else:
 # +
 # print(frz.history)
 # print(frz.comment)
+# -
+
+
