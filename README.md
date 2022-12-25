@@ -29,6 +29,8 @@ cd ChaSES
 
 2. [optional] Create environment
 
+<!-- mamba env create -n ChaSES  -f environment.yml-->
+
 ```
 mamba create -n ChaSES
 mamba activate ChaSES
