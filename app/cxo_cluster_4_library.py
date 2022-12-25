@@ -25,7 +25,7 @@ from bokeh.models import ColumnDataSource, CustomJS, Slider, Legend, \
         Button, CheckboxButtonGroup, RadioButtonGroup, RadioGroup, CheckboxGroup, Label, Spacer, Title, Div, \
         PanTool, WheelZoomTool, SaveTool, ResetTool, HoverTool, TapTool, \
         BasicTicker, Scatter, CustomJSHover, FileInput, Toggle, TableColumn, DataTable, TextAreaInput, \
-        Panel, Tabs, DateFormatter, LogColorMapper, LinearColorMapper, ColorBar
+        TabPanel, Tabs, DateFormatter, LogColorMapper, LinearColorMapper, ColorBar
 from bokeh.plotting import figure, output_file, show, save
 from bokeh.resources import CDN
 from bokeh.themes import Theme

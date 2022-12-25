@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.14.0
+#       jupytext_version: 1.14.4
 #   kernelspec:
 #     display_name: Python [conda env:p39] *
 #     language: python
@@ -50,7 +50,7 @@ from bokeh.models import ColumnDataSource, CustomJS, Slider, Legend, \
         Button, CheckboxButtonGroup, RadioButtonGroup, RadioGroup, CheckboxGroup, Label, Spacer, Title, Div, \
         PanTool, WheelZoomTool, SaveTool, ResetTool, HoverTool, TapTool, \
         BasicTicker, Scatter, CustomJSHover, FileInput, Toggle, TableColumn, DataTable, TextAreaInput, \
-        Panel, Tabs, DateFormatter, LogColorMapper, LinearColorMapper, ColorBar, Select, PreText, \
+        TabPanel, Tabs, DateFormatter, LogColorMapper, LinearColorMapper, ColorBar, Select, PreText, \
         HTMLTemplateFormatter, NumberFormatter, ScientificFormatter, TextInput
 from bokeh.plotting import figure, output_file, show, save
 from bokeh.resources import CDN
@@ -338,7 +338,7 @@ def modify_doc(doc):
     
     save_div = bk.Div(text='', visible=False)
     
-    title = bk.Div(text='<b>Search for extended sources in Chandra ACIS images</b>', style={'font-size': '200%', 'color': 'black'})
+    title = bk.Div(text='<b>Search for extended sources in Chandra ACIS images</b>', styles={'font-size': '200%', 'color': 'black'})
 
     # cite = bk.Div(text=q['cite_text'], width=1000, margin=(5, 5, 0, 5))
 
@@ -474,7 +474,9 @@ def modify_doc(doc):
         
         X = scaled_xy['X'].copy()
         
-        X_source.data['X'] = X
+        # X_source.data['X'] = X
+        
+        X_source.data = {'X': X, 'db': [0]*len(X)}  
         
         H, bkg_dens = app1_lib.nbins_sigma_func(X, nbins_slider.value, sigma_slider.value)
         
